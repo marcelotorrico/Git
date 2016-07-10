@@ -1,0 +1,23 @@
+https://github.com/darblade666/agiles.git
+
+UNIRSE A UN REPOSITORIO Y HACER CAMBIOS
+
+-Crear una carpeta para el proyecto
+-Ir y hacer git init
+-git remote add nombre url
+-git pull nombre HEAD
+-modificar
+-git add *
+-git commit -m "mensaje"
+-git push nombre master
+
+
+https://github.com/marcelotorrico/Bootstrap.git
+
+CRER UN REPOSITORIO Y SUBIR CAMBIOS
+-Crear un nuevo repositorio en git
+-Ir a la carpeta del proyecto y hacer git init
+-git remote add nombre url
+-git add *
+-git commit -m "un mensaje"
+-git push nombre master
