@@ -1,0 +1,105 @@
+Obteniendo Datos
+
+Para obtener datos de las tablas tenemos varios métodos realmente mágicos:
+
+findAll(): Obtiene todos los registros de la tabla. Retorna un array.
+find(): Obtiene un registro a partir de la clave primaria de la tabla.
+findBy(): Obtiene los registros encontrados pudiendo pasar como argumentos los valores que irían dentro del WHERE. Retorna un array.
+findOneBy(): obtiene un registro pudiendo pasar como argumentos los valores que irían dentro del WHERE.
+Veamos unos ejemplos de la utilización de estos métodos:
+
+$em = $this->getDoctrine()->getEntityManager();
+//-- Obtenemos todos los artículos de la tabla
+$articulos = $em->getRepository('MDWDemoBundle:Articles')->findAll();
+//-- Obtenemos el artículo con el id igual a 5
+$articulo = $em->getRepository('MDWDemoBundle:Articles')->find(5);
+//-- Obtenemos el artículo cuyo slug sea "articulo-1"
+$articulos = $em->getRepository('MDWDemoBundle:Articles')->findOneBy(array('slug' => 'articulo-1'));
+//-- Obtenemos todos los artículos de autor John Doe que sean de la categoría "Symfony"
+$articulos = $em->getRepository('MDWDemoBundle:Articles')->findBy(
+	array(
+		'author' => 'John Doe',
+		'category' => 'Symfony'
+	)
+);
+
+2. Utilizando las claves foráneas
+
+Otra de las formas de obtener datos es por medio de las claves foráneas las cuales fueros configuradas en nuestra entidad por medio de los annotatios @ManyToOne, @OneToMany. Una vez que obtemos por ejemplo un artículo podríamos obtener todos sus comentarios de la siguiente manera.
+
+$em = $this->getDoctrine()->getEntityManager();
+$articulo = $em->getRepository('MDWDemoBundle:Articles')->findOneBySlug('articulo-de-ejemplo-1');
+$comentarios = $articulo->getComments();
+
+foreach($comentarios as $c)
+{
+    echo $c->getContent();
+}
+Al utilizar la clave foránea configurada en nuestra entidad invocando al getter getComments(), doctrine se encargará se generar la sentencia SELECT necesaria para obtener todos los comentarios.
+
+3. Generando DQL
+Por si las formas de obtener datos que ya vimos nos quedan cortas, cosa que por lo general es así, Doctrine nos permite trabajar con algo muy parecido al SQL estándar al que estamos acostumbrados a trabajar solo que como estamos trabajando con el ORM se llama DQL es decir Doctrine Query Language.
+
+El DQL es realmente muy parecido al SQL con la diferencia que en lugar de hacer queries contra registros de las tablas, los hacemos sobre objetos de tipo Entity, por ejemplo un select bien sencillo:
+
+SELECT * FROM articles
+en DQL sería:
+
+select a from MDWDemoBundle:Articles a
+donde la “a” es nada más que un simple alias que podemos llamar como queramos. El cambio principal se nota en que en lugar se hacer referencia a la tabla articles estamos haciendo referencia a la entidad MDWDemoBundle:Articles. Con esta sintaxis estamos dejando que doctrine se encargue de la traducción al SQL necesario para el motor de base de datos utilizado y configurado inicialmente.
+
+También es posible pedir solo algunos campos y no un SELECT * poniendo los nombres de las propiedades del objeto usando el alias:
+
+select a.id, a.title, c.author from MDWDemoBundle:Articles a
+Para decirle a Doctrine que ejecute este DQL lo hacemos a través del EntityManager de la siguiente manera:
+
+$em = $this->getDoctrine()->getEntityManager();
+$dql = "select a from MDWDemoBundle:Articles a";
+$query = $em->createQuery($dql);
+$articulos = $query->getResult();
+Con el código anterior utilizamos el DQL para generar un objeto de Doctrine llamado “Doctrine_Query” representado por $query y luego a este objeto le pedimos que nos devuelva los resultados invocando al getResult() lo que nos devolverá un array de objetos Articles y para acceder a sus datos simplemente utilizamos los getters del objeto. Por ejemplo si quisieramos recorrer el array de articulos y obtener el id lo haríamos así ya que siguen siendo objetos metidos dentro de un array:
+
+foreach($articulos as $articulo)
+{
+    $id = $articulo->getId();
+    $title = $articulo->getTitle();
+}
+En caso de necesitar pasar filtros para el WHERE, podemos hacerlo usando el método setParameter() del objeto Doctrine_Query de la siguiente manera:
+
+$em = $this->getDoctrine()->getEntityManager();
+$dql = "select a from MDWDemoBundle:Articles a where a.author=:author and a.title like :title";
+$query = $em->createQuery($dql);
+$query->setParameter('author', 'John Doe');
+$query->setParameter('title', '%ejemplo 1%');
+$articulos = $query->getResult();
+Con la utilización del setParameter() ya no nos preocupamos de poner por ejemplo comillas a los filtros que no son numéricos ya que Doctrine ya sabe de que tipo de dato es cada columna por medio de la definición que hicimos de la entidad.
+
+También tenemos por supuesto soporte para unir entidades por medio de la cláusula JOIN por lo que este SQL estándar lo podríamos convertir a DQL de la siguiente manera:
+
+$em = $this->getDoctrine()->getEntityManager();
+$dql = "select a.id, a.title, c.author
+        from MDWDemoBundle:Comments c
+        join c.article a
+        where a.author=:author
+        and a.title like :title";
+$query = $em->createQuery($dql);
+$query->setParameter('author', 'John Doe');
+$query->setParameter('title', '%ejemplo 1%');
+$articulos = $query->getResult();
+Hay una diferencia a la hora de obtener los datos. Ya que estamos obteniendo una mezcla de datos de articulos y comentarios, el método getResult() nos devuelve todo ya directamente en un array como siempre estuvimos acostumbrados a trabajar con PDO por lo tanto la estructura del array devuelto sería la siguiente:
+
+Array
+(
+    [0] => Array
+    (
+        [id] => 4
+        [title] => Articulo de ejemplo 1
+        [author] => Autor 1
+    )
+    [1] => Array
+    (
+        [id] => 4
+        [title] => Articulo de ejemplo 1
+        [author] => Autor 2
+    )
+)

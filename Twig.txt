@@ -1,0 +1,17 @@
+Lo básico de Twig
+
+{{ dump(empleados) }}
+{# comentario #}
+{{ mostrar_algo }}
+{% hacer algo %}
+Con Twig mostrar el contenido de una variable es tan simple como usar las dobles llaves {{ variable }}, sin necesidad de echo ni etiquetas de apertura de PHP (<?php ?>), además de eso Twig es un lenguaje de plantillas, lo que nos permite hacer condicionales y estructuras de control muy intuitivas y funcionales:
+
+<ul>
+  {% for usuario in usuarios %}
+    <li>{{ usuario.nombreusuario | upper }}</li>
+  {% else %}
+    <li><em>no hay usuarios</em></li>
+  {% endfor %}
+</ul>
+¿for .. else?: sí, esto en realidad no existe en PHP, como puedes notar Twig internamente hace una comprobación de la colección (u array) antes de iterarlo, lo que hace a la plantilla más fácil de escribir y es intuitivo para maquetadores.
+{{ usuario.nombreusuario | upper }} Twig dispone de una serie de filtros, los cuales puedes anidar hacia la derecha con el operador “pipe” (|) de esta forma con el filtro upper nos imprime el valor de la variable usuario.nombreusuario en mayúsculas, al final del capítulo mostraremos los filtros más comunes.

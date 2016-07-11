@@ -1,0 +1,30 @@
+COMANDOS SYMFONY
+
+-Limpiando Cache: php app/console cache:clear
+	               php app/console cache:clear --env=dev
+		app/console doctrine:cache:clear-metadata 
+		app/console doctrine:cache:clear-query  
+		app/console doctrine:cache:clear-result
+
+-Para Produccion: web/app.php: appKernes('prod', true)
+
+-Creando un Bundle: php app\console generate:bundle ->Tiene que terminar en bundle, yml
+
+-estilos a las paginas de symfony: php app/console assets:install    //
+
+- crear base de datos(): php app/console doctrine:database:create
+
+-crear entidades: app/console doctrine:generate:entity -> IdentificadorBundle:Entidad ->annotation
+
+-crear las tablas en la BD: php app/console doctrine:schema:create
+
+-Borrar las tablas de la BD: php app/console doctrine:schema:drop --force
+
+-Actualizar tablas de la BD: php app/console doctrine:schema:update --force
+
+-Crear Formulario: php app/console doctrine:generate:form MTDLoginBundle:Entidad
+
+
+
+ENLACES
+Formularios: http://gitnacho.github.io/symfony-docs-es/book/forms.html
