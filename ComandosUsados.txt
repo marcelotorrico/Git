@@ -24,7 +24,7 @@ COMANDOS SYMFONY
 
 -Crear Formulario: php app/console doctrine:generate:form MTDLoginBundle:Entidad
 
-
+- http://localhost/AdministracionRRHH/web/app_dev.php/inicio
 
 ENLACES
 Formularios: http://gitnacho.github.io/symfony-docs-es/book/forms.html
